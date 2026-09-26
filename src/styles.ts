@@ -9,7 +9,7 @@ export default css`
 
   clock-weather-card-today {
     display: flex;
-    /* align-items: flex-start; */
+    align-items: flex-start;
   }
 
   clock-weather-card-summary {

@@ -35,6 +35,8 @@ export interface ClockWeatherCardConfig extends LovelaceCardConfig {
   apparent_sensor?: string
   aqi_sensor?: string
   summary_sensor?: string
+  aqi_min?: number
+  aqi_max?: number
 }
 
 export interface MergedClockWeatherCardConfig extends LovelaceCardConfig {
@@ -62,6 +64,8 @@ export interface MergedClockWeatherCardConfig extends LovelaceCardConfig {
   show_decimal: boolean
   apparent_sensor?: string
   aqi_sensor?: string
+  aqi_min: number
+  aqi_max: number
   summary_sensor?: string
 }
 
