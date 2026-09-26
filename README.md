@@ -121,6 +121,9 @@ use_browser_time: false
 time_zone: null
 show_decimal: false
 apparent_sensor: sensor.real_feel_temperature
+show_wind: false
+wind_speed_sensor: sensor.wind_speed
+wind_direction_sensor: sensor.wind_direction
 aqi_sensor: sensor.air_quality_index
 aqi_min: 0
 aqi_max: 300
@@ -155,6 +158,9 @@ summary_sensor: sensor.sydney_extended_text_0
 | time_zone             | string           | **Optional** | Uses the given [time zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) to indicate the current date and time. If not provided, uses the time zone configured in HA                                              | `null`    |
 | show_decimal          | boolean          | **Optional** | Displays main temperature without rounding                                                                                                                                                                                        | `false`   |
 | apparent_sensor       | string           | **Optional** | ID of the apparent temperature sensor entity. It is used to show the apparent temperature based on a sensor and will only show it if value is provided.                                                                           | `''`      |
+| show_wind             | boolean          | **Optional** | Shows wind in the today section, below the apparent temperature and above the AQI. Reads speed from `wind_speed_sensor` and direction from `wind_direction_sensor`.                                                                 | `false`   |
+| wind_speed_sensor     | string           | **Optional** | ID of the wind speed sensor entity. Used when `show_wind` is `true`. The sensor's unit of measurement is shown with the value.                                                                                                      | `''`      |
+| wind_direction_sensor | string           | **Optional** | ID of the wind direction sensor entity. Used when `show_wind` is `true`. Degrees or direction names are shown as an 8-point cardinal abbreviation (`N`, `NE`, `E`, `SE`, `S`, `SW`, `W`, `NW`).                                      | `''`      |
 | aqi_sensor       | string           | **Optional** | ID of the Air Quality Index sensor entity. It is used to show the AQI based on a sensor and will only show it if value is provided.                                                                           | `''`      |
 | show_precipitation    | boolean          | **Optional** | Displays an additional column in the forecast section, between the weather icon and the minimum temperature, showing the expected precipitation for each row                                                                      | `false`   |
 | precipitation_precision | number         | **Optional** | Number of decimal places to use when displaying the precipitation value (e.g. `0`, `1`, `2`). Only used if `show_precipitation` is set to `true`                                                                                  | `0`       |

@@ -34,6 +34,9 @@ export interface ClockWeatherCardConfig extends LovelaceCardConfig {
   time_zone?: string
   show_decimal?: boolean
   apparent_sensor?: string
+  show_wind?: boolean
+  wind_speed_sensor?: string
+  wind_direction_sensor?: string
   aqi_sensor?: string
   show_precipitation?: boolean
   precipitation_precision?: number
@@ -68,6 +71,9 @@ export interface MergedClockWeatherCardConfig extends LovelaceCardConfig {
   time_zone?: string
   show_decimal: boolean
   apparent_sensor?: string
+  show_wind: boolean
+  wind_speed_sensor?: string
+  wind_direction_sensor?: string
   aqi_sensor?: string
   show_precipitation: boolean
   precipitation_precision: number

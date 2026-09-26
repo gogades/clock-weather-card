@@ -27,7 +27,7 @@ import styles from './styles'
 import { actionHandler } from './action-handler-directive'
 import { localize } from './localize/localize'
 import { type HassEntity, type HassEntityBase } from 'home-assistant-js-websocket'
-import { extractMostOccuring, max, min, roundIfNotNull, roundUp } from './utils'
+import { extractMostOccuring, max, min, roundIfNotNull, roundUp, toCardinalDirection } from './utils'
 import { animatedIcons, staticIcons } from './images'
 import { version } from '../package.json'
 import { safeRender } from './helpers'
@@ -233,7 +233,10 @@ export class ClockWeatherCard extends LitElement {
     const localizedTemp = temp !== null ? this.toConfiguredTempWithUnit(tempUnit, temp) : null
     const localizedHumidity = humidity !== null ? `${humidity}% ${this.localize('misc.humidity')}` : null
     const localizedApparent = apparentTemp !== null ? this.toConfiguredTempWithUnit(tempUnit, apparentTemp) : null
+    const wind = this.getWind()
+    const localizedWind = this.formatWind(wind)
     const apparentString = this.localize('misc.feels-like')
+    const windString = this.localize('misc.wind')
     const aqiString = this.localize('misc.aqi')
 
     return html`
@@ -246,6 +249,7 @@ export class ClockWeatherCard extends LitElement {
             ${this.config.hide_clock ? weatherString : localizedTemp ? `${weatherString}, ${localizedTemp}` : weatherString}
             ${this.config.show_humidity && localizedHumidity ? html`<br>${localizedHumidity}` : ''}
             ${this.config.apparent_sensor && apparentTemp ? html`<br>${apparentString}: ${localizedApparent}` : ''}
+            ${this.config.show_wind && localizedWind ? html`<br>${windString}: ${localizedWind}` : ''}
             ${this.config.aqi_sensor && aqi !== null ? html`<br><aqi style="background-color: ${aqiBackgroundColor}; color: ${aqiTextColor};">${aqi} ${aqiString}</aqi>` : ''}
           </clock-weather-card-today-right-wrap-top>
           <clock-weather-card-today-right-wrap-center>
@@ -520,6 +524,9 @@ export class ClockWeatherCard extends LitElement {
       time_zone: config.time_zone ?? undefined,
       show_decimal: config.show_decimal ?? false,
       apparent_sensor: config.apparent_sensor ?? undefined,
+      show_wind: config.show_wind ?? false,
+      wind_speed_sensor: config.wind_speed_sensor ?? undefined,
+      wind_direction_sensor: config.wind_direction_sensor ?? undefined,
       aqi_sensor: config.aqi_sensor ?? undefined,
       show_precipitation: config.show_precipitation ?? false,
       precipitation_precision: config.precipitation_precision ?? 0,
@@ -582,6 +589,54 @@ export class ClockWeatherCard extends LitElement {
       }
     }
     return null
+  }
+
+  private getWind (): { speed: number | null, unit: string, direction: string | null } | null {
+    const speed = this.getWindSpeed()
+    const direction = this.getWindDirection()
+    if (speed === null && direction === null) {
+      return null
+    }
+    return {
+      speed: speed?.speed ?? null,
+      unit: speed?.unit ?? '',
+      direction
+    }
+  }
+
+  private getWindSpeed (): { speed: number, unit: string } | null {
+    if (!this.config.wind_speed_sensor) {
+      return null
+    }
+    const windSensor = this.hass.states[this.config.wind_speed_sensor] as HassEntity | undefined
+    const speed = windSensor?.state ? parseFloat(windSensor.state) : undefined
+    if (speed === undefined || isNaN(speed)) {
+      return null
+    }
+    const unitOfMeasurement = windSensor?.attributes.unit_of_measurement
+    const unit = typeof unitOfMeasurement === 'string' ? unitOfMeasurement : ''
+    return { speed, unit }
+  }
+
+  private getWindDirection (): string | null {
+    if (!this.config.wind_direction_sensor) {
+      return null
+    }
+    const directionSensor = this.hass.states[this.config.wind_direction_sensor] as HassEntity | undefined
+    const state = directionSensor?.state
+    if (!state) {
+      return null
+    }
+    return toCardinalDirection(state)
+  }
+
+  private formatWind (wind: { speed: number | null, unit: string, direction: string | null } | null): string | null {
+    if (wind === null) {
+      return null
+    }
+    const speedText = wind.speed !== null ? `${wind.speed}${wind.unit ? ` ${wind.unit}` : ''}` : null
+    const parts = [speedText, wind.direction].filter((part): part is string => part !== null && part !== '')
+    return parts.length > 0 ? parts.join(' ') : null
   }
 
   private getAqi (): number | null {
