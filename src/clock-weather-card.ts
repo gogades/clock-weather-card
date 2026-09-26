@@ -27,7 +27,7 @@ import styles from './styles'
 import { actionHandler } from './action-handler-directive'
 import { localize } from './localize/localize'
 import { type HassEntity, type HassEntityBase } from 'home-assistant-js-websocket'
-import { extractMostOccuring, max, min, roundIfNotNull, roundUp, toCardinalDirection } from './utils'
+import { extractMostOccuring, formatOneDecimal, max, min, roundIfNotNull, roundUp, toCardinalDirection } from './utils'
 import { animatedIcons, staticIcons } from './images'
 import { version } from '../package.json'
 import { safeRender } from './helpers'
@@ -220,19 +220,19 @@ export class ClockWeatherCard extends LitElement {
   private renderToday (): TemplateResult {
     const weather = this.getWeather()
     const state = weather.state
-    const temp = this.config.show_decimal ? this.getCurrentTemperature() : roundIfNotNull(this.getCurrentTemperature())
     const tempUnit = weather.attributes.temperature_unit
-    const apparentTemp = this.config.show_decimal ? this.getApparentTemperature() : roundIfNotNull(this.getApparentTemperature())
+    const temp = this.getCurrentTemperature()
+    const apparentTemp = this.getApparentTemperature()
     const aqi = this.getAqi()
-    const aqiBackgroundColor = this.getAqiBackgroundColor(aqi)
-    const aqiTextColor = this.getAqiTextColor(aqi)
+    const aqiBackgroundColor = this.config.monochrome_aqi ? null : this.getAqiBackgroundColor(aqi)
+    const aqiTextColor = this.config.monochrome_aqi ? null : this.getAqiTextColor(aqi)
     const humidity = roundIfNotNull(this.getCurrentHumidity())
     const iconType = this.config.weather_icon_type
     const icon = this.toIcon(state, iconType, false, this.getIconAnimationKind())
     const weatherString = this.localize(`weather.${state}`)
-    const localizedTemp = temp !== null ? this.toConfiguredTempWithUnit(tempUnit, temp) : null
+    const localizedTemp = this.toDisplayTemperature(tempUnit, temp)
     const localizedHumidity = humidity !== null ? `${humidity}% ${this.localize('misc.humidity')}` : null
-    const localizedApparent = apparentTemp !== null ? this.toConfiguredTempWithUnit(tempUnit, apparentTemp) : null
+    const localizedApparent = this.toDisplayTemperature(tempUnit, apparentTemp)
     const wind = this.getWind()
     const localizedWind = this.formatWind(wind)
     const apparentString = this.localize('misc.feels-like')
@@ -250,7 +250,11 @@ export class ClockWeatherCard extends LitElement {
             ${this.config.show_humidity && localizedHumidity ? html`<br>${localizedHumidity}` : ''}
             ${this.config.apparent_sensor && apparentTemp ? html`<br>${apparentString}: ${localizedApparent}` : ''}
             ${this.config.show_wind && localizedWind ? html`<br>${windString}: ${localizedWind}` : ''}
-            ${this.config.aqi_sensor && aqi !== null ? html`<br><aqi style="background-color: ${aqiBackgroundColor}; color: ${aqiTextColor};">${aqi} ${aqiString}</aqi>` : ''}
+            ${this.config.aqi_sensor && aqi !== null
+              ? this.config.monochrome_aqi
+                ? html`<br>${aqiString}: ${aqi}`
+                : html`<br><aqi style="background-color: ${aqiBackgroundColor}; color: ${aqiTextColor};">${aqiString}: ${aqi}</aqi>`
+              : ''}
           </clock-weather-card-today-right-wrap-top>
           <clock-weather-card-today-right-wrap-center>
             ${this.config.hide_clock ? localizedTemp ?? 'n/a' : this.time()}
@@ -528,6 +532,7 @@ export class ClockWeatherCard extends LitElement {
       wind_speed_sensor: config.wind_speed_sensor ?? undefined,
       wind_direction_sensor: config.wind_direction_sensor ?? undefined,
       aqi_sensor: config.aqi_sensor ?? undefined,
+      monochrome_aqi: config.monochrome_aqi ?? false,
       show_precipitation: config.show_precipitation ?? false,
       precipitation_precision: config.precipitation_precision ?? 0,
       precipitation_units: config.precipitation_units ?? '',
@@ -737,6 +742,17 @@ export class ClockWeatherCard extends LitElement {
 
   private getConfiguredTemperatureUnit (): TemperatureUnit {
     return this.hass.config.unit_system.temperature as TemperatureUnit
+  }
+
+  private toDisplayTemperature (unit: TemperatureUnit, temp: number | null): string | null {
+    if (temp === null) {
+      return null
+    }
+    const convertedTemp = this.toConfiguredTempWithoutUnit(unit, temp)
+    const value = this.config.show_decimal
+      ? formatOneDecimal(convertedTemp)
+      : String(Math.round(convertedTemp))
+    return value + this.getConfiguredTemperatureUnit()
   }
 
   private toConfiguredTempWithUnit (unit: TemperatureUnit, temp: number): string {

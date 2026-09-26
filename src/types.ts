@@ -38,6 +38,7 @@ export interface ClockWeatherCardConfig extends LovelaceCardConfig {
   wind_speed_sensor?: string
   wind_direction_sensor?: string
   aqi_sensor?: string
+  monochrome_aqi?: boolean
   show_precipitation?: boolean
   precipitation_precision?: number
   precipitation_units?: string
@@ -75,6 +76,7 @@ export interface MergedClockWeatherCardConfig extends LovelaceCardConfig {
   wind_speed_sensor?: string
   wind_direction_sensor?: string
   aqi_sensor?: string
+  monochrome_aqi: boolean
   show_precipitation: boolean
   precipitation_precision: number
   precipitation_units: string

@@ -81,6 +81,12 @@ export function toCardinalDirection (state: string): string | null {
   return NAMED_CARDINAL_DIRECTIONS[key] ?? null
 }
 
+export function formatOneDecimal (value: number): string {
+  const sign = value < 0 ? -1 : 1
+  const rounded = Math.round(Number((Math.abs(value) * 10).toPrecision(15))) / 10
+  return (sign * rounded).toFixed(1)
+}
+
 export function roundIfNotNull (number: number | null): number | null {
   if (number === null) {
     return null
