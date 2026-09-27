@@ -231,7 +231,8 @@ export class ClockWeatherCard extends LitElement {
     const icon = this.toIcon(state, iconType, false, this.getIconAnimationKind())
     const weatherString = this.localize(`weather.${state}`)
     const localizedTemp = this.toDisplayTemperature(tempUnit, temp)
-    const localizedHumidity = humidity !== null ? `${humidity}% ${this.localize('misc.humidity')}` : null
+    /* const localizedHumidity = humidity !== null ? `${humidity}% ${this.localize('misc.humidity')}` : null */
+    const localizedHumidity = humidity !== null ? `${this.localize('misc.humidity')}: ${humidity}%` : null
     const localizedApparent = this.toDisplayTemperature(tempUnit, apparentTemp)
     const wind = this.getWind()
     const localizedWind = this.formatWind(wind)
@@ -638,6 +639,9 @@ export class ClockWeatherCard extends LitElement {
   private formatWind (wind: { speed: number | null, unit: string, direction: string | null } | null): string | null {
     if (wind === null) {
       return null
+    }
+    if (wind.speed !== null && wind.speed < 1) {
+      return this.localize('misc.calm')
     }
     const speedText = wind.speed !== null ? `${wind.speed}${wind.unit ? ` ${wind.unit}` : ''}` : null
     const parts = [speedText, wind.direction].filter((part): part is string => part !== null && part !== '')
