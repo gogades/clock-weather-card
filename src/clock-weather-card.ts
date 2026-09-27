@@ -249,7 +249,7 @@ export class ClockWeatherCard extends LitElement {
           <clock-weather-card-today-right-wrap-top>
             ${this.config.hide_clock ? weatherString : localizedTemp ? `${weatherString}, ${localizedTemp}` : weatherString}
             ${this.config.show_humidity && localizedHumidity ? html`<br>${localizedHumidity}` : ''}
-            ${this.config.apparent_sensor && apparentTemp ? html`<br>${apparentString}: ${localizedApparent}` : ''}
+            ${this.shouldShowApparentTemperature(temp, apparentTemp) ? html`<br>${apparentString}: ${localizedApparent}` : ''}
             ${this.config.show_wind && localizedWind ? html`<br>${windString}: ${localizedWind}` : ''}
             ${this.config.aqi_sensor && aqi !== null
               ? this.config.monochrome_aqi
@@ -583,6 +583,16 @@ export class ClockWeatherCard extends LitElement {
 
     // Return weather humidity if the code could not extract humidity from the humidity_sensor
     return this.getWeather().attributes.humidity ?? null
+  }
+
+  private shouldShowApparentTemperature (actual: number | null, apparent: number | null): boolean {
+    if (!this.config.apparent_sensor || apparent === null) {
+      return false
+    }
+    if (actual === null) {
+      return true
+    }
+    return Math.abs(apparent - actual) > 1
   }
 
   private getApparentTemperature (): number | null {
