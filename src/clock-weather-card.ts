@@ -251,7 +251,7 @@ export class ClockWeatherCard extends LitElement {
             ${this.config.show_humidity && localizedHumidity ? html`<br>${localizedHumidity}` : ''}
             ${this.shouldShowApparentTemperature(temp, apparentTemp) ? html`<br>${apparentString}: ${localizedApparent}` : ''}
             ${this.config.show_wind && localizedWind ? html`<br>${windString}: ${localizedWind}` : ''}
-            ${this.config.aqi_sensor && aqi !== null
+            ${this.shouldShowAqi(aqi)
               ? this.config.monochrome_aqi
                 ? html`<br>${aqiString}: ${aqi}`
                 : html`<br><aqi style="background-color: ${aqiBackgroundColor}; color: ${aqiTextColor};">${aqiString}: ${aqi}</aqi>`
@@ -534,6 +534,7 @@ export class ClockWeatherCard extends LitElement {
       wind_direction_sensor: config.wind_direction_sensor ?? undefined,
       aqi_sensor: config.aqi_sensor ?? undefined,
       monochrome_aqi: config.monochrome_aqi ?? false,
+      aqi_display_min: config.aqi_display_min ?? 20,
       show_precipitation: config.show_precipitation ?? false,
       precipitation_precision: config.precipitation_precision ?? 0,
       precipitation_units: config.precipitation_units ?? '',
@@ -656,6 +657,10 @@ export class ClockWeatherCard extends LitElement {
     const speedText = wind.speed !== null ? `${wind.speed}${wind.unit ? ` ${wind.unit}` : ''}` : null
     const parts = [speedText, wind.direction].filter((part): part is string => part !== null && part !== '')
     return parts.length > 0 ? parts.join(' ') : null
+  }
+
+  private shouldShowAqi (aqi: number | null): boolean {
+    return aqi !== null && aqi > this.config.aqi_display_min
   }
 
   private getAqi (): number | null {
