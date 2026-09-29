@@ -268,7 +268,11 @@ export class ClockWeatherCard extends LitElement {
         <clock-weather-card-today-right-wrap>
           <clock-weather-card-today-right-wrap-top>
             ${this.config.hide_clock ? weatherString : localizedTemp ? `${weatherString}, ${localizedTemp}` : weatherString}
-            ${this.config.show_humidity && localizedHumidity ? html`<br>${localizedHumidity}` : ''}
+            ${this.config.show_humidity && localizedHumidity
+              ? this.isHumidityHigh(humidity)
+                ? html`<br><span style="color: ${this.config.humidity_high_color};">${localizedHumidity}</span>`
+                : html`<br>${localizedHumidity}`
+              : ''}
             ${this.shouldShowApparentTemperature(temp, apparentTemp) ? html`<br>${apparentString}: ${localizedApparent}` : ''}
             ${this.config.show_wind && localizedWind ? html`<br>${windString}: ${localizedWind}` : ''}
             ${this.shouldShowAqi(aqi)
@@ -539,6 +543,8 @@ export class ClockWeatherCard extends LitElement {
       time_format: config.time_format?.toString() as '12' | '24' | undefined,
       time_pattern: config.time_pattern ?? undefined,
       show_humidity: config.show_humidity ?? false,
+      humidity_high_threshold: config.humidity_high_threshold ?? undefined,
+      humidity_high_color: config.humidity_high_color ?? 'red',
       hide_forecast_section: config.hide_forecast_section ?? false,
       hide_today_section: config.hide_today_section ?? false,
       hide_summary_section: config.hide_summary_section ?? true,
@@ -591,6 +597,11 @@ export class ClockWeatherCard extends LitElement {
 
     // return weather temperature if above code could not extract temperature from temperature_sensor
     return this.getWeather().attributes.temperature ?? null
+  }
+
+  private isHumidityHigh (humidity: number | null): boolean {
+    const threshold = this.config.humidity_high_threshold
+    return humidity !== null && threshold !== undefined && humidity > threshold
   }
 
   private getCurrentHumidity (): number | null {

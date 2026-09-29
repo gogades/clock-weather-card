@@ -110,6 +110,8 @@ date_pattern: ccc, d.MM.yy
 hide_today_section: false
 hide_forecast_section: false
 show_humidity: false
+humidity_high_threshold: 70
+humidity_high_color: red
 show_precipitation: true
 precipitation_precision: 0
 precipitation_units: " mm"
@@ -150,6 +152,8 @@ summary_sensor: sensor.sydney_extended_text_0
 | time_pattern          | string           | **Optional** | Pattern to use for time formatting. See [luxon](https://moment.github.io/luxon/#/formatting?id=table-of-tokens) for valid tokens. If not provided, falls back to time_format option.                                              | `null`    |
 | date_pattern          | string           | **Optional** | Pattern to use for date formatting. If not provided, falls back to a localized default date formatting. See [luxon](https://moment.github.io/luxon/#/formatting?id=table-of-tokens) for valid tokens                              | `D`       |
 | show_humidity         | boolean          | **Optional** | Shows the humidity in the today section. Reads the value from `humidity_sensor`, if provided, otherwise from the `humidity` attribute of the configured weather `entity`                                                           | `false`   |
+| humidity_high_threshold | number           | **Optional** | When set, the humidity is rendered in `humidity_high_color` if its value is higher than this threshold. Has no effect unless `show_humidity` is `true`                                                                            | `null`    |
+| humidity_high_color   | string           | **Optional** | CSS color used to render the humidity when it is higher than `humidity_high_threshold`                                                                                                                                            | `red`     |
 | hide_today_section    | boolean          | **Optional** | Hides the cards today section (upper section), containing the large weather icon, clock and current date                                                                                                                          | `false`   |
 | hide_forecast_section | boolean          | **Optional** | Hides the cards forecast section (lower section),containing the weather forecast                                                                                                                                                  | `false`   |
 | hide_clock            | boolean          | **Optional** | Hides the clock from the today section and prominently displays the current temperature instead                                                                                                                                   | `false`   |

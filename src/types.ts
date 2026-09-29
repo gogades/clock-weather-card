@@ -26,6 +26,8 @@ export interface ClockWeatherCardConfig extends LovelaceCardConfig {
   hide_forecast_section?: boolean
   hide_summary_section?: boolean
   show_humidity?: boolean
+  humidity_high_threshold?: number
+  humidity_high_color?: string
   hourly_forecast?: boolean
   forecast_layout?: 'rows' | 'horizontal'
   hide_clock?: boolean
@@ -65,6 +67,8 @@ export interface MergedClockWeatherCardConfig extends LovelaceCardConfig {
   hide_forecast_section: boolean
   hide_summary_section: boolean
   show_humidity: boolean
+  humidity_high_threshold?: number
+  humidity_high_color: string
   hourly_forecast: boolean
   forecast_layout: 'rows' | 'horizontal'
   hide_clock: boolean
